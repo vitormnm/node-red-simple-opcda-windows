@@ -1,6 +1,6 @@
 {
   "name": "@vitormnm/node-red-simple-opcda-windows",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publishConfig": {
     "access": "public"
   },
@@ -26,6 +26,10 @@
       "opcda-client-config": "client/opcda-client-config.js",
       "opcda-client": "client/opcda-client.js"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vitormnm/node-red-simple-opcda-windows"
   },
   "dependencies": {}
 }
