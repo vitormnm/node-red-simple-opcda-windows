@@ -1,0 +1,125 @@
+<script type="text/javascript">
+    (function () {
+        RED.nodes.registerType("opcda-client-config", {
+            category: "config",
+            defaults: {
+                name: { value: "" },
+                server: { value: "Matrikon.OPC.Simulation.1", required: true },
+                nodeName: { value: "" },
+                commandTimeout: { value: 15000, validate: RED.validators.number() },
+                autoReconnect: { value: true },
+                reconnectInterval: { value: 5000, validate: RED.validators.number() }
+            },
+            label: function () {
+                return this.name || this.server || "opcda-client-config";
+            },
+            oneditprepare: function () {
+                var node = this;
+
+                if (node.autoReconnect !== false) {
+                    $("#node-config-input-autoReconnect").prop("checked", true);
+                }
+
+                function toggleReconnect() {
+                    var autoReconnect = $("#node-config-input-autoReconnect").prop("checked");
+                    $(".opcda-client-reconnect-row").toggle(autoReconnect);
+                }
+                $("#node-config-input-autoReconnect").on("change", toggleReconnect);
+                toggleReconnect();
+
+                // Discovered servers drop down populate
+                var serverDropdown = $("#opcda-client-config-discovered-servers");
+                var currentServerVal = $("#node-config-input-server").val() || "";
+
+                function fetchServers() {
+                    var nodeName = $("#node-config-input-nodeName").val() || "";
+                    serverDropdown.empty().append('<option value="">Loading servers...</option>');
+                    
+                    $.getJSON("opcda-client-config/discover", { nodeName: nodeName })
+                        .done(function (data) {
+                            serverDropdown.empty().append('<option value="">-- Select an OPC Server --</option>');
+                            if (data && Array.isArray(data.servers)) {
+                                data.servers.forEach(function (srv) {
+                                    var opt = $("<option></option>").val(srv).text(srv);
+                                    if (srv === currentServerVal) {
+                                        opt.prop("selected", true);
+                                    }
+                                    serverDropdown.append(opt);
+                                });
+                            }
+                        })
+                        .fail(function (xhr) {
+                            serverDropdown.empty().append('<option value="">Error loading servers</option>');
+                            var message = xhr && xhr.responseJSON && xhr.responseJSON.error
+                                ? xhr.responseJSON.error
+                                : "Failed to retrieve servers from C# client.";
+                            RED.notify("OPC DA Discovery Error: " + message, "error");
+                        });
+                }
+
+                $("#opcda-client-config-btn-discover").off("click").on("click", function (e) {
+                    e.preventDefault();
+                    fetchServers();
+                });
+
+                serverDropdown.on("change", function () {
+                    var val = $(this).val();
+                    if (val) {
+                        $("#node-config-input-server").val(val);
+                    }
+                });
+
+                // Load initial servers list
+                fetchServers();
+            }
+        });
+    })();
+</script>
+
+<script type="text/html" data-template-name="opcda-client-config">
+    <!-- Connection Section -->
+    <div class="form-row" style="margin-top: 10px; margin-bottom: 10px;">
+        <span style="font-weight: bold;"><i class="fa fa-plug"></i> Connection Settings</span>
+        <hr style="margin-top: 5px; margin-bottom: 10px; border: 0; border-top: 1px solid #ccc;"/>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="OPC DA Client">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-nodeName"><i class="fa fa-desktop"></i> Node Name (Optional)</label>
+        <input type="text" id="node-config-input-nodeName" placeholder="localhost or remote PC name/IP">
+    </div>
+    <div class="form-row" style="display: flex; align-items: center; gap: 8px;">
+        <label for="opcda-client-config-discovered-servers"><i class="fa fa-list"></i> Select Server</label>
+        <select id="opcda-client-config-discovered-servers" style="width: calc(100% - 148px); margin: 0;"></select>
+        <a href="#" id="opcda-client-config-btn-discover" class="editor-button" style="margin: 0; flex: 0 0 auto;"><i class="fa fa-refresh"></i></a>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-server"><i class="fa fa-server"></i> Server ProgID</label>
+        <input type="text" id="node-config-input-server" placeholder="Matrikon.OPC.Simulation.1">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-commandTimeout"><i class="fa fa-clock-o"></i> Command Timeout (ms)</label>
+        <input type="number" id="node-config-input-commandTimeout" placeholder="15000">
+    </div>
+
+    <!-- Reconnection Settings -->
+    <div class="form-row" style="margin-top: 20px; margin-bottom: 10px;">
+        <span style="font-weight: bold;"><i class="fa fa-refresh"></i> Reconnect Settings</span>
+        <hr style="margin-top: 5px; margin-bottom: 10px; border: 0; border-top: 1px solid #ccc;"/>
+    </div>
+    <div class="form-row" style="display: flex; align-items: center;">
+        <label for="node-config-input-autoReconnect" style="width: auto; margin-right: 10px;"><i class="fa fa-refresh"></i> Automatic Reconnect</label>
+        <input type="checkbox" id="node-config-input-autoReconnect" style="width: auto; margin: 0;">
+    </div>
+    <div class="form-row opcda-client-reconnect-row">
+        <label for="node-config-input-reconnectInterval"><i class="fa fa-clock-o"></i> Interval (ms)</label>
+        <input type="number" id="node-config-input-reconnectInterval" placeholder="5000">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="opcda-client-config">
+    <p>Shared OPC DA client connection for read, write, browse, and subscription nodes.</p>
+    <p>Specify the OPC DA Server ProgID (e.g., <code>Matrikon.OPC.Simulation.1</code> or <code>Kepware.KEPServerEX.V6</code>) to connect.</p>
+</script>

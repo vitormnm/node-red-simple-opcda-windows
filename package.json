@@ -1,0 +1,31 @@
+{
+  "name": "@vitormnm/node-red-simple-opcda-windows",
+  "version": "1.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "OPC DA Client Wrapper for Windows based on OPCDAAuto.dll",
+  "main": "client/opcda-client.js",
+  "engines": {
+    "node": ">=13"
+  },
+  "keywords": [
+    "node-red",
+    "opc-da",
+    "opcda",
+    "opc"
+  ],
+  "author": {
+    "name": "Vitor Mião",
+    "url": "https://vitormiao.com/"
+  },
+  "license": "MIT",
+  "node-red": {
+    "version": ">=2.1.0",
+    "nodes": {
+      "opcda-client-config": "client/opcda-client-config.js",
+      "opcda-client": "client/opcda-client.js"
+    }
+  },
+  "dependencies": {}
+}

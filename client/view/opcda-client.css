@@ -1,0 +1,280 @@
+body.opcda-tree-modal-open {
+    overflow: hidden;
+}
+
+.opcda-tree-editor {
+    width: 100%;
+    min-height: 120px;
+    border: 1px solid var(--red-ui-form-input-border-color, #d9d9d9);
+    background: var(--red-ui-form-input-background, #fff);
+    border-radius: 4px;
+    overflow: auto;
+}
+
+.opcda-tree-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 24px;
+    padding: 2px 6px;
+    font-size: 12px;
+    border-bottom: 1px solid transparent;
+}
+
+.opcda-tree-row:hover {
+    background: var(--red-ui-list-item-background-hover, #f3f7fd);
+}
+
+.opcda-tree-row.is-selected {
+    background: var(--red-ui-list-item-background-selected, #d9ecff);
+    color: var(--red-ui-list-item-color-selected, inherit);
+}
+
+.opcda-tree-indent {
+    flex: 0 0 auto;
+    width: 14px;
+}
+
+.opcda-tree-twisty {
+    width: 16px;
+    text-align: center;
+    color: #777;
+    flex: 0 0 16px;
+    cursor: pointer;
+}
+
+.opcda-tree-icon {
+    width: 14px;
+    text-align: center;
+    color: #777;
+    flex: 0 0 14px;
+}
+
+.opcda-tree-label {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.opcda-tree-type {
+    color: #777;
+    font-size: 11px;
+    flex: 0 0 auto;
+}
+
+.opcda-tree-title {
+    min-width: 100px;
+    font-weight: 600;
+    color: #444;
+}
+
+.opcda-client-nodeid-label {
+    margin-left: auto;
+    text-align: right;
+    word-break: break-all;
+    max-width: 320px;
+    color: #777;
+    font-size: 12px;
+}
+
+.opcda-tree-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.opcda-tree-empty {
+    padding: 14px;
+    border: 1px dashed #d9d9d9;
+    border-radius: 4px;
+    background: #fafafa;
+    color: #777;
+    text-align: center;
+}
+
+.opcda-client-json {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.opcda-client-tag-box {
+    width: 100%;
+    min-height: 70px;
+}
+
+.opcda-client-tag-chip {
+    display: grid;
+    grid-template-columns: 18px 1fr auto;
+    grid-template-areas:
+        "icon name name"
+        "icon write right";
+    column-gap: 8px;
+    row-gap: 6px;
+    align-items: center;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    background: #fafafa;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+}
+
+.opcda-client-tag-chip .opcda-tree-icon {
+    grid-area: icon;
+}
+
+.opcda-client-tag-chip .opcda-tree-title {
+    grid-area: name;
+    min-width: 0;
+}
+
+.opcda-client-tag-right {
+    grid-area: right;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.opcda-client-tag-right .opcda-client-nodeid-label {
+    margin: 0;
+    max-width: 320px;
+}
+
+.opcda-client-tag-right .opcda-tree-actions {
+    margin: 0;
+}
+
+.opcda-client-tag-chip-meta,
+.opcda-client-description {
+    color: #777;
+    font-size: 12px;
+}
+
+.opcda-client-tag-write {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    margin-top: 0;
+    margin-left: 0;
+    grid-area: write;
+}
+
+.opcda-client-tag-write input {
+    font-size: 12px;
+    flex: 1 1 auto;
+    min-width: 120px;
+}
+
+.opcda-client-tag-write .red-ui-typedInput-container {
+    flex: 1 1 auto;
+    min-width: 220px;
+    width: 100% !important;
+}
+
+.opcda-client-tag-write .red-ui-typedInput-container input.red-ui-typedInput-input {
+    width: calc(100% - 92px);
+    min-width: 120px;
+}
+
+.opcda-client-load-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.opcda-client-load-row input {
+    flex: 1 1 auto;
+}
+
+.opcda-tree-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+.opcda-tree-search input {
+    flex: 1 1 auto;
+    min-width: 120px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    box-shadow: none;
+    margin: 0;
+}
+
+.opcda-tree-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(0, 0, 0, 0.45);
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.opcda-tree-modal__dialog {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background: #f3f3f3;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.opcda-tree-modal__header,
+.opcda-tree-modal__toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 18px;
+    background: #fff;
+    border-bottom: 1px solid #d9d9d9;
+}
+
+.opcda-tree-modal__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.opcda-tree-modal__header .editor-button-small {
+    margin-left: auto;
+}
+
+.opcda-tree-modal__body {
+    flex: 1 1 auto;
+    overflow: auto;
+    padding: 18px;
+}
+
+.opcda-tree-context-menu {
+    position: fixed;
+    z-index: 2200;
+    min-width: 170px;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    padding: 6px 0;
+}
+
+.opcda-tree-context-menu a {
+    display: block;
+    padding: 7px 12px;
+    color: #333;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.opcda-tree-context-menu a:hover {
+    background: #f3f7fd;
+}
