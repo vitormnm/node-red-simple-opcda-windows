@@ -36,6 +36,7 @@ module.exports = function (RED) {
         }
 
         node.activeSubscription = false;
+        node.subscribedTags = null;
 
         const updateStatus = () => {
             if (!node.connection) {
@@ -57,7 +58,7 @@ module.exports = function (RED) {
             updateStatus();
 
             const tryAutoSubscribe = async (label) => {
-                const tags = node.configuredTags;
+                const tags = node.subscribedTags;
                 if (tags && tags.length > 0) {
                     try {
                         node.log(`Auto-subscribing (${label})...`);
@@ -67,7 +68,7 @@ module.exports = function (RED) {
                             groupName: node.groupName,
                             requestedUpdateRate: node.updateRate,
                             tags: tags,
-                            mode: config.subscriptionMode || "append"
+                            mode: "replace"
                         });
                         node.activeSubscription = true;
                         node.status({ fill: "green", shape: "dot", text: "subscribed" });
@@ -80,14 +81,9 @@ module.exports = function (RED) {
                 }
             };
 
-            // If already connected, attempt auto-subscription immediately
-            if (node.connection.isConnected && node.mode === "subscription") {
-                tryAutoSubscribe("startup");
-            }
-
             const onConnected = async () => {
                 updateStatus();
-                if (node.mode === "subscription") {
+                if (node.mode === "subscription" && node.activeSubscription) {
                     await tryAutoSubscribe("reconnect");
                 }
             };
@@ -166,7 +162,7 @@ module.exports = function (RED) {
 
             try {
                 if (node.mode === "subscription") {
-                    let subMode = config.subscriptionMode || "append";
+                    let subMode = config.subscriptionMode || "replace";
                     let groupName = node.groupName;
                     let updateRate = node.updateRate;
                     let action = "subscribe";
@@ -189,6 +185,11 @@ module.exports = function (RED) {
                         }
                     }
 
+                    if (msg.payload === null || (Array.isArray(msg.payload) && msg.payload.length === 0)) {
+                        action = "unsubscribe";
+                        subMode = "clear";
+                    }
+
                     if (action === "unsubscribe" || subMode === "clear") {
                         const tags = (action === "unsubscribe" && subMode !== "clear") ? getTagsList(msg) : [];
                         const response = await node.connection.executeCommand("unsubscribe", {
@@ -198,7 +199,15 @@ module.exports = function (RED) {
 
                         if (tags.length === 0) {
                             node.activeSubscription = false;
+                            node.subscribedTags = null;
                             updateStatus();
+                        } else if (node.subscribedTags) {
+                            node.subscribedTags = node.subscribedTags.filter(t => !tags.includes(t));
+                            if (node.subscribedTags.length === 0) {
+                                node.activeSubscription = false;
+                                node.subscribedTags = null;
+                                updateStatus();
+                            }
                         }
 
                         msg.payload = response.data;
@@ -219,6 +228,11 @@ module.exports = function (RED) {
                         });
 
                         node.activeSubscription = true;
+                        if (subMode === "append" && node.subscribedTags) {
+                            node.subscribedTags = Array.from(new Set([...node.subscribedTags, ...tags]));
+                        } else {
+                            node.subscribedTags = tags;
+                        }
                         updateStatus();
 
                         const nameMap = getNameMap(msg);
@@ -495,29 +509,6 @@ module.exports = function (RED) {
             return [];
         }
 
-        // Auto subscribe on startup if configured
-        if (node.mode === "subscription" && node.configuredTags.length > 0) {
-            const startAutoSub = () => {
-                node.connection.addSubscriptionListener(node.groupName, handleDataChange);
-                node.connection.executeCommand("subscribe", {
-                    groupName: node.groupName,
-                    requestedUpdateRate: node.updateRate,
-                    tags: node.configuredTags,
-                    mode: config.subscriptionMode || "append"
-                }).then(() => {
-                    node.activeSubscription = true;
-                    updateStatus();
-                }).catch((err) => {
-                    node.error("Auto-subscription failed: " + err.message);
-                });
-            };
-
-            if (node.connection.isConnected) {
-                startAutoSub();
-            } else {
-                node.connection.once("connected", startAutoSub);
-            }
-        }
 
         node.on("close", function (done) {
             if (node.connection) {

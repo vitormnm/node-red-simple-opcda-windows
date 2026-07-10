@@ -1056,7 +1056,7 @@
                 groupName: { value: "" },
                 updateRate: { value: 1000, validate: RED.validators.number() },
                 recursiveValues: { value: false },
-                subscriptionMode: { value: "append" }
+                subscriptionMode: { value: "replace" }
             },
             inputs: 1,
             outputs: 1,
@@ -1527,7 +1527,7 @@
     <details style="margin-bottom: 10px; border: 1px solid #ddd; padding: 10px; border-radius: 4px;">
         <summary style="cursor: pointer; font-weight: bold; outline: none;"><i class="fa fa-rss"></i> Subscription Mode</summary>
         <p style="margin-top: 5px;">Establishes a subscription group and streams tag changes to flow output.</p>
-        <p><b>Input (msg.payload):</b> Array of tags to subscribe to. If not provided, uses configured tags.</p>
+        <p><b>Input (msg.payload):</b> Array of tags to subscribe to. If not provided, uses configured tags. If <code>msg.payload</code> is <code>null</code> or an empty array (<code>[]</code>), the entire subscription group is cleared/canceled.</p>
         <p><b>Output (msg.payload):</b> Streams an array of event objects in real-time when data changes:</p>
         <pre>
 [
@@ -1562,6 +1562,7 @@ msg.opcda = {
                 <ul>
                     <li>Use <code>action: "unsubscribe"</code> to remove the tags in <code>msg.payload</code>.</li>
                     <li>Use <code>action: "clear"</code> (or <code>subscriptionMode: "clear"</code>) to clear the entire group's subscription.</li>
+                    <li>Set <code>msg.payload = []</code> or <code>msg.payload = null</code> to cancel/clear the subscription.</li>
                 </ul>
             </li>
         </ul>
